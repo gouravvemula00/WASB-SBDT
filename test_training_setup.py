@@ -135,9 +135,10 @@ def test_combined_loss():
         'bounce': {0: torch.randn(1, 2, 288, 512)}  # Bounce detection (multi-scale format)
     }
     
+    # Create proper targets with values between 0 and 1
     targets = {
-        0: torch.randn(1, 3, 288, 512),  # Ball detection targets
-        'bounce': {0: torch.randn(1, 2, 288, 512)}  # Bounce detection targets (multi-scale format)
+        0: torch.rand(1, 3, 288, 512),  # Ball detection targets (0-1 range)
+        'bounce': {0: torch.rand(1, 2, 288, 512)}  # Bounce detection targets (0-1 range)
     }
     
     # Test loss computation
