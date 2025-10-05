@@ -122,8 +122,9 @@ def test_combined_loss():
         }
     }
     
-    # Create loss function
-    loss_fn = build_loss_criteria(cfg)
+    # Create loss function directly
+    from src.losses.combined_loss import CombinedLoss
+    loss_fn = CombinedLoss(cfg)
     
     # Create mock predictions and targets
     predicts = {
