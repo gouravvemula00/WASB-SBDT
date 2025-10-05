@@ -39,8 +39,12 @@ class CombinedLoss(nn.Module):
             predicts: dict with '0' (ball detection) and optionally 'bounce' keys
             targets: dict with '0' (ball detection) and optionally 'bounce' keys
         """
+        # Extract ball detection parts for HeatmapLoss
+        ball_predicts = {0: predicts[0]} if 0 in predicts else {}
+        ball_targets = {0: targets[0]} if 0 in targets else {}
+        
         # Ball detection loss
-        ball_loss = self.ball_loss(predicts, targets)
+        ball_loss = self.ball_loss(ball_predicts, ball_targets)
         
         # Bounce detection loss (only if enabled and predictions available)
         bounce_loss = torch.tensor(0.0, device=ball_loss.device)
