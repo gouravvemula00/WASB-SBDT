@@ -61,8 +61,13 @@ class BounceLoss(nn.Module):
                 # Reshape for loss computation
                 if pred.dim() == 4:
                     b, c, h, w = pred.shape
-                    pred = pred.view(b, c, -1)
-                    target = target.view(b, -1)
+                    if self.loss_type == 'bce':
+                        # For BCE, we need to match the target shape
+                        pred = pred.view(b, c, -1)  # (b, 2, h*w)
+                        target = target.view(b, c, -1)  # (b, 2, h*w)
+                    else:
+                        pred = pred.view(b, c, -1)
+                        target = target.view(b, -1)
                 
                 loss = self.loss_fn(pred, target)
                 
