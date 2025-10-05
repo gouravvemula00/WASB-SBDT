@@ -131,8 +131,8 @@ def test_combined_loss():
     
     # Create mock predictions and targets
     predicts = {
-        0: torch.randn(1, 3, 288, 512),  # Ball detection
-        'bounce': {0: torch.randn(1, 2, 288, 512)}  # Bounce detection (multi-scale format)
+        0: torch.randn(1, 3, 288, 512, requires_grad=True),  # Ball detection
+        'bounce': {0: torch.randn(1, 2, 288, 512, requires_grad=True)}  # Bounce detection (multi-scale format)
     }
     
     # Create proper targets with values between 0 and 1
