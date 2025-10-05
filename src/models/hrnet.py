@@ -252,7 +252,7 @@ blocks_dict = {
 # https://github.com/HRNet/HRNet-Image-Classification/blob/master/lib/models/cls_hrnet.py
 class HRNet(nn.Module):
 
-    def __init__(self, cfg, **kwargs):
+    def __init__(self, cfg, enable_bounce_detection=False, **kwargs):
         super(HRNet, self).__init__()
 
         self._frames_in  = cfg['frames_in']
@@ -260,6 +260,7 @@ class HRNet(nn.Module):
         self._out_scales = cfg['out_scales']
         self._stem_strides  = cfg['MODEL']['EXTRA']['STEM']['STRIDES']
         self._stem_inplanes = cfg['MODEL']['EXTRA']['STEM']['INPLANES']
+        self._enable_bounce_detection = enable_bounce_detection
 
         self.conv1 = nn.Conv2d(3*self._frames_in, self._stem_inplanes, kernel_size=3, stride=self._stem_strides[0], padding=1, bias=False)
         self.bn1   = nn.BatchNorm2d(self._stem_inplanes, momentum=BN_MOMENTUM)
@@ -309,6 +310,10 @@ class HRNet(nn.Module):
 
         self.deconv_layers = self._make_deconv_layers(cfg, pre_stage_channels[0])
         self.final_layers  = self._make_final_layers(cfg, pre_stage_channels)
+        
+        # Add bounce detection heads if enabled
+        if self._enable_bounce_detection:
+            self.bounce_layers = self._make_bounce_layers(cfg, pre_stage_channels)
 
     def _get_deconv_cfg(self, deconv_kernel):
         if deconv_kernel == 4:
@@ -328,6 +333,14 @@ class HRNet(nn.Module):
         layers      = []
         for scale in self._out_scales:
             layers.append( nn.Conv2d(in_channels=channels[scale], out_channels=self._frames_out, kernel_size=kernel_size) )
+        return nn.ModuleList(layers)
+
+    def _make_bounce_layers(self, cfg, channels):
+        """Create bounce detection heads"""
+        kernel_size = cfg['MODEL']['EXTRA']['FINAL_CONV_KERNEL']
+        layers      = []
+        for scale in self._out_scales:
+            layers.append( nn.Conv2d(in_channels=channels[scale], out_channels=2, kernel_size=kernel_size) )
         return nn.ModuleList(layers)
 
     def _make_deconv_layers(self, cfg, input_channels):
@@ -480,6 +493,18 @@ class HRNet(nn.Module):
                 x = self.deconv_layers[i][scale](x)
             y = self.final_layers[scale](x)
             y_out[scale] = y
+        
+        # Add bounce predictions if enabled
+        if self._enable_bounce_detection:
+            bounce_out = {}
+            for scale in self._out_scales:
+                x = y_list[scale]
+                for i in range(self.num_deconvs):
+                    x = self.deconv_layers[i][scale](x)
+                bounce_y = self.bounce_layers[scale](x)
+                bounce_out[scale] = bounce_y
+            y_out['bounce'] = bounce_out
+            
         return y_out
 
     def init_weights(self, pretrained='',):

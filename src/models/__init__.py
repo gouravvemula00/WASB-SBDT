@@ -25,7 +25,8 @@ def build_model(cfg):
         halve_channel = cfg['model']['halve_channel']
         model      = __factory[model_name]( frames_in*3, frames_out, bilinear=bilinear, halve_channel=halve_channel)
     elif model_name=='higher_hrnet' or model_name=='cls_hrnet' or model_name=='hrnet':
-        model = __factory[model_name](cfg['model'])
+        enable_bounce_detection = cfg['model'].get('enable_bounce_detection', False)
+        model = __factory[model_name](cfg['model'], enable_bounce_detection=enable_bounce_detection)
     elif model_name=='restracknetv2':
         frames_in        = cfg['model']['frames_in']
         frames_out       = cfg['model']['frames_out']

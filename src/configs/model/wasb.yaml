@@ -7,6 +7,7 @@ out_height: 288
 out_width: 512
 rgb_diff: False
 out_scales: [0]
+enable_bounce_detection: true
 MODEL:
   EXTRA:
     FINAL_CONV_KERNEL: 1
