@@ -344,13 +344,13 @@ class HRNet(nn.Module):
         return nn.ModuleList(layers)
 
     def _make_deconv_layers(self, cfg, input_channels):
-        extra      = cfg.MODEL.EXTRA
-        deconv_cfg = extra.DECONV
+        extra      = cfg['MODEL']['EXTRA']
+        deconv_cfg = extra['DECONV']
 
         deconv_layers = []
-        for i in range(deconv_cfg.NUM_DECONVS): 
+        for i in range(deconv_cfg['NUM_DECONVS']): 
             output_channels                        = input_channels
-            deconv_kernel, padding, output_padding = self._get_deconv_cfg(deconv_cfg.KERNEL_SIZE[i])
+            deconv_kernel, padding, output_padding = self._get_deconv_cfg(deconv_cfg['KERNEL_SIZE'][i])
 
             layers = []
             layers.append(nn.Sequential(
