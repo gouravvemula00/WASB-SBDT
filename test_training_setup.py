@@ -96,12 +96,12 @@ def test_wasb_model():
     
     print(f"Model outputs keys: {list(outputs.keys())}")
     print(f"Ball detection output shape: {outputs[0].shape}")
-    print(f"Bounce detection output shape: {outputs['bounce'].shape}")
+    print(f"Bounce detection output shape: {outputs['bounce'][0].shape}")
     
     assert 0 in outputs, "Ball detection output missing"
     assert 'bounce' in outputs, "Bounce detection output missing"
     assert outputs[0].shape == (1, 3, 288, 512), f"Unexpected ball detection shape: {outputs[0].shape}"
-    assert outputs['bounce'].shape == (1, 2, 288, 512), f"Unexpected bounce detection shape: {outputs['bounce'].shape}"
+    assert outputs['bounce'][0].shape == (1, 2, 288, 512), f"Unexpected bounce detection shape: {outputs['bounce'][0].shape}"
     
     print("✓ WASB model test passed!")
 
@@ -128,12 +128,12 @@ def test_combined_loss():
     # Create mock predictions and targets
     predicts = {
         0: torch.randn(1, 3, 288, 512),  # Ball detection
-        'bounce': torch.randn(1, 2, 288, 512)  # Bounce detection
+        'bounce': {0: torch.randn(1, 2, 288, 512)}  # Bounce detection (multi-scale format)
     }
     
     targets = {
         0: torch.randn(1, 3, 288, 512),  # Ball detection targets
-        'bounce': torch.randn(1, 2, 288, 512)  # Bounce detection targets
+        'bounce': {0: torch.randn(1, 2, 288, 512)}  # Bounce detection targets (multi-scale format)
     }
     
     # Test loss computation
