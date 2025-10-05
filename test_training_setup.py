@@ -114,6 +114,9 @@ def test_combined_loss():
         'ball_weight': 1.0,
         'bounce_weight': 0.5,
         'enable_bounce_detection': True,
+        'loss': {
+            'sub_name': 'bce'  # Required for HeatmapLoss
+        },
         'bounce_loss': {
             'loss_type': 'bce',
             'auto_weight': False,
