@@ -3,6 +3,7 @@ ext: '.jpg'
 root_dir: /root/datasets/tennis
 csv_filename: 'Label.csv'
 visible_flags: [1,2]
+bounce_column: 'bounce'  # Column name for bounce annotations
 train:
   matches: [ 'game1', 
              'game2', 

@@ -104,3 +104,25 @@ class DeepBallPostprocessor(object):
         #print(results)
         return results
 
+    def run_bounce(self, bounce_preds):
+        """
+        Process bounce predictions to get bounce probabilities
+        """
+        results = defaultdict(lambda: defaultdict(dict))
+        for scale in self._scales:
+            if scale in bounce_preds:
+                preds_ = bounce_preds[scale]
+                preds_ = F.softmax(preds_, dim=1)
+                bounce_probs = preds_[:, 1:2, :, :]  # Get bounce channel
+                bounce_probs = bounce_probs.cpu().numpy()
+                
+                b, s, h, w = bounce_probs.shape
+                for i in range(b):
+                    for j in range(s):
+                        bounce_hm = bounce_probs[i, j]
+                        # Get bounce probability at the peak location
+                        bounce_prob = np.max(bounce_hm)
+                        results[i][j][scale] = {'bounce_prob': bounce_prob, 'bounce_hm': bounce_hm}
+        
+        return results
+

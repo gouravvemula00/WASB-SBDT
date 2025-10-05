@@ -1,0 +1,9 @@
+name: combined
+enable_bounce_detection: true
+ball_weight: 1.0
+bounce_weight: 0.5
+bounce_loss:
+  loss_type: 'bce'
+  auto_weight: false
+  scales: [0]
+  neg_factor: 3

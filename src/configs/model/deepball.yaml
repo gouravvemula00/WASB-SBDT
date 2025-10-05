@@ -14,3 +14,4 @@ block_maxpools: [True, True, True]
 first_conv_kernel_size: 7
 first_conv_stride: 2
 last_conv_kernel_size: 3
+enable_bounce_detection: true

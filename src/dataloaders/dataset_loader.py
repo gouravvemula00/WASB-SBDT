@@ -142,6 +142,7 @@ class ImageDataset(Dataset):
 
             px, py = anno['center'].xy
             visi   = anno['center'].is_visible
+            is_bounce = getattr(anno['center'], 'is_bounce', False)
 
             xys.append([px, py])
             visis.append(visi)
@@ -150,9 +151,9 @@ class ImageDataset(Dataset):
                 if visi:
                     ct     = affine_transform(np.array([px,py]), trans_outputs[scale])
                     ct_int = ct.astype(np.int32)
-                    hm     = self._hm_generator((out_w,out_h), ct_int, binary=binary)
+                    hm     = self._hm_generator((out_w,out_h), ct_int, binary=binary, is_bounce=is_bounce)
                 else:
-                    hm     = self._hm_generator((out_w,out_h), (-1.,-1.))
+                    hm     = self._hm_generator((out_w,out_h), (-1.,-1.), is_bounce=False)
 
                 hm = np.expand_dims(hm, axis=0)
                 hms[scale].append(hm)

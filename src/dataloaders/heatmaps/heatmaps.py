@@ -1,20 +1,24 @@
 from typing import Tuple
 import numpy as np
 
-from utils import gen_binary_map, gen_heatmap
+from utils import gen_binary_map, gen_heatmap, gen_bounce_heatmap
 
 class BinaryFixedSizeMapGenerator:
     def __init__(self, cfg):
         self._sigma     = cfg['sigmas'][0]
         self._data_type = np.float32
         self._min_value = cfg['min_value']
+        self._enable_bounce = cfg.get('enable_bounce', False)
         
     def __call__(self, 
                  wh: Tuple[int, int],
                  cxy: Tuple[float, float],
                  binary: bool = True,
+                 is_bounce: bool = False,
                  ):
-        if binary:
+        if self._enable_bounce:
+            return gen_bounce_heatmap(wh, cxy, self._sigma, is_bounce, self._data_type, min_value=self._min_value)
+        elif binary:
             return gen_binary_map(wh, cxy, self._sigma, self._data_type)
         else:
             return gen_heatmap(wh, cxy, self._sigma, self._data_type, min_value=self._min_value)

@@ -51,12 +51,14 @@ def build_model(cfg):
         first_conv_kernel_size = cfg['model']['first_conv_kernel_size']
         last_conv_kernel_size  = cfg['model']['last_conv_kernel_size']
         first_conv_stride      = cfg['model']['first_conv_stride']
+        enable_bounce_detection = cfg['model'].get('enable_bounce_detection', False)
         model = __factory[model_name]( frames_in*3, frames_out*class_out,
                                        block_channels=block_channels,
                                        block_maxpools=block_maxpools, 
                                        first_conv_kernel_size=first_conv_kernel_size, 
                                        first_conv_stride=first_conv_stride, 
-                                       last_conv_kernel_size=last_conv_kernel_size)
+                                       last_conv_kernel_size=last_conv_kernel_size,
+                                       enable_bounce_detection=enable_bounce_detection)
     elif model_name=='ballseg':
         frames_in     = cfg['model']['frames_in']
         frames_out    = cfg['model']['frames_out']

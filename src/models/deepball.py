@@ -33,6 +33,7 @@ class ConvBlock(nn.Module):
 class DeepBall(nn.Module):
     '''
     https://arxiv.org/abs/1902.07304
+    Extended with bounce detection head
     '''
     def __init__(self, 
                  n_channels, 
@@ -43,11 +44,13 @@ class DeepBall(nn.Module):
                  first_conv_kernel_size=7, 
                  last_conv_kernel_size=3, 
                  first_conv_stride=2,
+                 enable_bounce_detection=False,
                  ):
         super(DeepBall, self).__init__()
         self.n_channels = n_channels
         self.n_classes  = n_classes
         self.bilinear   = bilinear
+        self.enable_bounce_detection = enable_bounce_detection
 
         if first_conv_kernel_size==7:
             kernel_size_list = [7,3]
@@ -85,6 +88,10 @@ class DeepBall(nn.Module):
         else:
             raise ValueError('last_conv_kernel_size is 3 or 1')
         self.conv4_2 = nn.Conv2d( channels_concat, n_classes, last_conv_kernel_size, stride=1, padding=padding, bias=True)
+        
+        # Bounce detection head
+        if self.enable_bounce_detection:
+            self.bounce_head = nn.Conv2d( channels_concat, 2, last_conv_kernel_size, stride=1, padding=padding, bias=True)
 
     def forward(self, x):
         x1 = self.conv1(x)
@@ -95,5 +102,13 @@ class DeepBall(nn.Module):
         x4 = torch.cat([x1,x2,x3], dim=1)
         x4 = self.conv4_1(x4)
         logits = self.conv4_2(x4)
-        return {0: logits}
+        
+        outputs = {0: logits}
+        
+        # Add bounce detection output if enabled
+        if self.enable_bounce_detection:
+            bounce_logits = self.bounce_head(x4)
+            outputs['bounce'] = bounce_logits
+            
+        return outputs
 

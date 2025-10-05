@@ -104,6 +104,12 @@ class DeepBallDetector(object):
         preds = self._model(imgs)
         #print(preds.shape)
         xys, visis  = self._postprocessor.run(preds)
+        
+        # Handle bounce predictions if available
+        bounces = None
+        if 'bounce' in preds:
+            bounces = self._postprocessor.run_bounce(preds['bounce'])
+        
         affine_mats = affine_mats.numpy()
         batch_size  = xys.shape[0]
         xys_t       = []
@@ -117,5 +123,9 @@ class DeepBallDetector(object):
                 #print(xy_)
                 xys_t_.append(xy_)
             xys_t.append(xys_t_)
-        return np.array(xys_t), visis
+        
+        if bounces is not None:
+            return np.array(xys_t), visis, bounces
+        else:
+            return np.array(xys_t), visis
 

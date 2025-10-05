@@ -8,6 +8,7 @@ class Center:
     x: float # x coordinate
     y: float # y coordinate
     r: Optional[float] = field(default=-1) # radius
+    is_bounce: Optional[bool] = field(default=False) # bounce detection
     @property
     def diameter(self) -> float:
         if r is None:

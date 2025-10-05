@@ -32,7 +32,7 @@ def get_clips(cfg, train_or_test='test', gt=True):
                 if frame_name.endswith(ext):
                     frame_names.append(frame_name)
             frame_names.sort()
-            ball_xyvs = load_csv(clip_csv_path, visible_flags) if gt else None
+            ball_xyvs = load_csv(clip_csv_path, visible_flags, bounce_column=self._bounce_column) if gt else None
             clip_dict[(match, clip_name)] = {'clip_dir_or_path': clip_dir, 'clip_gt_dict': ball_xyvs, 'frame_names': frame_names}
 
     return clip_dict
@@ -45,6 +45,7 @@ class Tennis(object):
         self._ext                  = cfg['dataset']['ext']
         self._csv_filename         = cfg['dataset']['csv_filename']
         self._visible_flags        = cfg['dataset']['visible_flags']
+        self._bounce_column        = cfg['dataset'].get('bounce_column', None)
         self._train_matches        = cfg['dataset']['train']['matches']
         self._test_matches         = cfg['dataset']['test']['matches']
         self._train_num_clip_ratio = cfg['dataset']['train']['num_clip_ratio']
@@ -182,7 +183,7 @@ class Tennis(object):
                 clip_seq_gt_dict = {}
                 clip_frame_dir   = osp.join(self._root_dir, match, clip_name)
                 clip_csv_path    = osp.join(self._root_dir, match, clip_name, self._csv_filename )
-                ball_xyvs = load_csv(clip_csv_path, self._visible_flags, frame_dir=clip_frame_dir)
+                ball_xyvs = load_csv(clip_csv_path, self._visible_flags, frame_dir=clip_frame_dir, bounce_column=self._bounce_column)
                 frame_names = []
                 for frame_name in os.listdir(clip_frame_dir):
                     if frame_name.endswith(self._ext):

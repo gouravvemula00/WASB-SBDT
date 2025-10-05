@@ -2,10 +2,14 @@ from torch import nn
 
 from .heatmap import HeatmapLoss
 from .segmentation import SegmentationLoss
+from .bounce_loss import BounceLoss
+from .combined_loss import CombinedLoss
 
 __factory = {
         'heatmap': HeatmapLoss,
-        'segmentation': SegmentationLoss
+        'segmentation': SegmentationLoss,
+        'bounce': BounceLoss,
+        'combined': CombinedLoss
         }
 
 def build_loss_criteria(cfg):
